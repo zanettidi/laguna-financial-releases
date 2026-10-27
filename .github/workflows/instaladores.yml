@@ -1,0 +1,130 @@
+# Instaladores do Laguna Financial, gerados aqui (num repositorio publico o GitHub
+# Actions nao gasta minutos) a partir do codigo do repositorio privado
+# zanettidi/laguna-financial, e publicados na release da versao neste repositorio
+# -- e' daqui que se descarrega e que a aplicacao instalada ve' se ha' versao nova.
+#
+# Uso: Actions › Instaladores › "Run workflow" com a tag do repositorio privado
+# (ex.: v2.2.0). So' quem tem acesso de escrita a este repositorio o pode correr.
+#
+# Secret SOURCE_TOKEN: token fine-grained so' do repositorio privado, com
+# Contents: Read-only. O checkout nao o guarda (persist-credentials: false) e nao
+# ha' cache: nada do codigo fica neste repositorio, so' os instaladores.
+#
+# Assinatura no macOS (opcional; sem ela o .dmg sai sem assinatura): secrets
+# MAC_CERTIFICATE (o .p12 do "Developer ID Application" em base64),
+# MAC_CERTIFICATE_PASSWORD e MAC_SIGN_NAME ("Nome (TEAMID)"); com APPLE_ID,
+# APPLE_TEAM_ID e APPLE_APP_PASSWORD tambem e' notarizado.
+name: Instaladores
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag do repositorio privado (ex.: v2.2.0)"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency: instaladores-${{ inputs.tag }}
+
+jobs:
+  instalador:
+    strategy:
+      fail-fast: false
+      matrix:
+        # macos-14: Apple Silicon; macos-15-intel: Intel.
+        os: [macos-14, macos-15-intel, windows-2022, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Versao da tag
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag }}
+        run: |
+          if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::A tag tem de ser v<major>.<minor>.<patch> (ex.: v2.2.0)."
+            exit 1
+          fi
+          echo "VERSAO=${TAG#v}" >> "$GITHUB_ENV"
+
+      - name: Token do repositorio privado
+        shell: bash
+        env:
+          SOURCE_TOKEN: ${{ secrets.SOURCE_TOKEN }}
+        run: |
+          if [ -z "$SOURCE_TOKEN" ]; then
+            echo "::error::Falta o secret SOURCE_TOKEN (ver o comentario no topo do workflow)."
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+        with:
+          repository: zanettidi/laguna-financial
+          ref: ${{ inputs.tag }}
+          token: ${{ secrets.SOURCE_TOKEN }}
+          persist-credentials: false
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      # O certificado vai para uma keychain temporaria do runner, apagada no fim.
+      - name: Certificado de assinatura (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        env:
+          MAC_CERTIFICATE: ${{ secrets.MAC_CERTIFICATE }}
+          MAC_CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          MAC_SIGN_NAME: ${{ secrets.MAC_SIGN_NAME }}
+        run: |
+          if [ -z "$MAC_CERTIFICATE" ] || [ -z "$MAC_SIGN_NAME" ]; then
+            echo "::warning::Sem certificado da Apple: o .dmg sai sem assinatura."
+            exit 0
+          fi
+          KEYCHAIN="$RUNNER_TEMP/assinatura.keychain-db"
+          KEYCHAIN_PASSWORD=$(openssl rand -hex 16)
+          echo "$MAC_CERTIFICATE" | base64 --decode > "$RUNNER_TEMP/certificado.p12"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security import "$RUNNER_TEMP/certificado.p12" -P "$MAC_CERTIFICATE_PASSWORD" \
+            -A -t cert -f pkcs12 -k "$KEYCHAIN"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+          rm "$RUNNER_TEMP/certificado.p12"
+          echo "MAC_KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+          echo "MAC_SIGN_NAME=$MAC_SIGN_NAME" >> "$GITHUB_ENV"
+
+      - name: Build, testes e instalador
+        shell: bash
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: ./scripts/criar-instalador.sh
+
+      - name: Apagar a keychain temporaria
+        if: always() && runner.os == 'macOS' && env.MAC_KEYCHAIN != ''
+        shell: bash
+        run: security delete-keychain "$MAC_KEYCHAIN"
+
+      # So' os instaladores (os mesmos da release), nunca o jar nem o codigo.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instalador-${{ matrix.os }}
+          path: target/instalador/*
+          if-no-files-found: error
+
+      # O texto so' e' escrito ao criar a release; as notas completas acrescentam-se
+      # depois a' mao sem que outro job as apague (ver publicar-release.sh).
+      - name: Publicar na release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+          NOTAS: |
+            Instaladores do Laguna Financial ${{ env.VERSAO }} para macOS (Apple Silicon e Intel), Windows e Linux.
+            Como instalar, abrir pela primeira vez e atualizar sem perder os dados: ver o [README](https://github.com/zanettidi/laguna-financial-releases#readme).
+        run: ./scripts/publicar-release.sh "$GITHUB_REPOSITORY" "$TAG" "Laguna Financial $VERSAO" "$NOTAS"
