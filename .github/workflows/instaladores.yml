@@ -5,6 +5,8 @@
 #
 # Uso: Actions › Instaladores › "Run workflow" com a tag do repositorio privado
 # (ex.: v2.2.0). So' quem tem acesso de escrita a este repositorio o pode correr.
+# Com "publicar" desligado so' gera os instaladores (ficam nos artefactos do run),
+# para testar uma mudanca no workflow sem tocar na release.
 #
 # Secret SOURCE_TOKEN: token fine-grained so' do repositorio privado, com
 # Contents: Read-only. O checkout nao o guarda (persist-credentials: false) e nao
@@ -22,6 +24,10 @@ on:
       tag:
         description: "Tag do repositorio privado (ex.: v2.2.0)"
         required: true
+      publicar:
+        description: "Publicar na release (desligado: so' os artefactos do run)"
+        type: boolean
+        default: true
 
 permissions:
   contents: write
@@ -58,14 +64,14 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           repository: zanettidi/laguna-financial
           ref: ${{ inputs.tag }}
           token: ${{ secrets.SOURCE_TOKEN }}
           persist-credentials: false
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: '21'
@@ -111,7 +117,7 @@ jobs:
         run: security delete-keychain "$MAC_KEYCHAIN"
 
       # So' os instaladores (os mesmos da release), nunca o jar nem o codigo.
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: instalador-${{ matrix.os }}
           path: target/instalador/*
@@ -120,6 +126,7 @@ jobs:
       # O texto so' e' escrito ao criar a release; as notas completas acrescentam-se
       # depois a' mao sem que outro job as apague (ver publicar-release.sh).
       - name: Publicar na release
+        if: inputs.publicar
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
