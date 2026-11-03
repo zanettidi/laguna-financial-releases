@@ -52,7 +52,7 @@ Os instaladores trazem o Java e a base de dados incluídos — não é preciso i
 Ao abrir, a aplicação abre no browser (`http://localhost:8081`) e fica um ícone na barra do sistema com **Abrir** e **Sair**. No primeiro uso, crie a sua conta (fica só no seu computador) em "Criar conta"; o guia **Primeiros passos** no Início ajuda a configurar o resto em poucos minutos.
 
 ### Primeira abertura (instaladores sem assinatura)
-- **macOS:** se disser que não pode verificar o programador, clique direito na aplicação › **Abrir** (ou Definições do Sistema › Privacidade e segurança › **Abrir mesmo assim**).
+- **macOS:** na primeira abertura, o macOS avisa que não consegue verificar a aplicação. Feche o aviso (sem a mover para o lixo), abra **Definições do Sistema › Privacidade e segurança**, desça até "Segurança" e clique em **Abrir mesmo assim** (pede a palavra-passe do Mac). Só é preciso uma vez por versão. Em alternativa, no Terminal: `xattr -dr com.apple.quarantine "/Applications/Laguna Financial.app"`
 - **Windows:** no aviso do SmartScreen, **Mais informações** › **Executar mesmo assim**.
 
 ## Atualizar
