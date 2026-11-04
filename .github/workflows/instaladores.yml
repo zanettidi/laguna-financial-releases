@@ -116,12 +116,14 @@ jobs:
         shell: bash
         run: security delete-keychain "$MAC_KEYCHAIN"
 
-      # So' os instaladores (os mesmos da release), nunca o jar nem o codigo.
+      # So' os instaladores (os mesmos da release), nunca o jar nem o codigo; 1 dia,
+      # como no repositorio privado: o que fica e' o que esta' na release.
       - uses: actions/upload-artifact@v7
         with:
           name: instalador-${{ matrix.os }}
           path: target/instalador/*
           if-no-files-found: error
+          retention-days: 1
 
       # O texto so' e' escrito ao criar a release; as notas completas acrescentam-se
       # depois a' mao sem que outro job as apague (ver publicar-release.sh).
