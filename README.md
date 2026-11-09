@@ -19,7 +19,8 @@
 - **Despesas para o IRS** — quanto gastou por ano em saúde, educação, habitação, IVA por exigência de fatura…, pela categoria de cada despesa, para conferir o e-fatura e classificar as faturas pendentes.
 - **Investimentos** — ações e ETF registados à mão: carteira a preço de custo, dividendos, mais-valias por FIFO e um relatório anual de apoio ao IRS.
 - **Várias moedas** — cada conta na sua moeda; os totais convertem para a moeda principal com o câmbio do Banco Central Europeu do dia de cada movimento (ou com taxas suas).
-- **Cópias de segurança** — uma por semana automaticamente, mais as que fizer à mão, e restaurar com um clique. Exporta também tudo em CSV, que abre no Excel ou no LibreOffice.
+- **Cópias de segurança** — uma por semana automaticamente, mais as que fizer à mão, e restaurar com um clique. Exporta também tudo num ZIP de ficheiros CSV, que abrem no Excel ou no LibreOffice, e importa esse ZIP noutra instalação.
+- **Autenticação em dois passos** (opcional) — além da palavra-passe, um código da aplicação de autenticação do telemóvel (Google Authenticator, Microsoft Authenticator, 1Password…).
 - **Português, inglês e espanhol**, tema claro e escuro, e a moeda à escolha (euro, real, dólar, libra…).
 
 | | |
@@ -34,7 +35,8 @@
 - Ficam **no seu computador**, na pasta `.laguna-financial` da sua área pessoal. Não há servidor nosso nem conta online.
 - A aplicação só fala com a internet para **ver se há uma versão nova** (consulta este repositório no GitHub; não envia dados seus) e, **só se tiver contas noutras moedas**, para buscar o câmbio ao Banco Central Europeu (pede as taxas publicadas, sem nada seu; pode desligar em Preferências › Moedas e câmbio). Se ligar os avisos no browser, esses avisos passam pelo serviço de notificações do próprio browser.
 - A aplicação só aceita ligações do próprio computador (`localhost`): ninguém na sua rede lhe chega.
-- Pode exportar tudo a qualquer momento e levar os dados para outro computador copiando a pasta.
+- Pode exportar tudo a qualquer momento e levar os dados para outro computador: importe o ZIP exportado (Preferências › **Os seus dados** › Importar dados) ou copie a pasta.
+- Pode **apagar a conta** e todos os dados de vez, em Preferências › **Os seus dados**. A política de privacidade está na própria aplicação (link na entrada e nas Preferências).
 
 ## Instalar
 
@@ -61,7 +63,7 @@ Quando houver uma versão nova, a aplicação avisa no menu lateral ("Nova vers�
 
 ## Cópias de segurança
 
-Em Preferências › **Cópias de segurança**: fazer uma cópia agora, uma cópia automática por semana (ficam as 5 mais recentes) e restaurar qualquer cópia. Em Preferências › **Os seus dados** pode também exportar tudo num ZIP de ficheiros CSV.
+Em Preferências › **Cópias de segurança**: fazer uma cópia agora, uma cópia automática por semana (ficam as 5 mais recentes) e restaurar qualquer cópia. Em Preferências › **Os seus dados** pode também exportar tudo num ZIP de ficheiros CSV e importá-lo noutra instalação (numa conta ainda sem movimentos).
 
 ## Perguntas frequentes
 
@@ -74,5 +76,7 @@ Em Preferências › **Cópias de segurança**: fazer uma cópia agora, uma cóp
 **Calcula a dedução do IRS?** Não: mostra quanto gastou em cada tipo de dedução para conferir o e-fatura. As percentagens e os limites mudam com o ano e com o agregado familiar.
 
 **Esqueci-me da palavra-passe.** Em "Recuperar palavra-passe", o link para a repor fica num ficheiro `repor-palavra-passe.txt` dentro da pasta `.laguna-financial` (não é enviado por email).
+
+**Perdi o telemóvel e tenho os dois passos ligados.** Entre com um dos 10 códigos de recuperação que recebeu ao ligar os dois passos (cada um serve uma vez); depois, em Preferências › **Segurança**, desligue-os e volte a ligá-los com o telemóvel novo. Sem o telemóvel e sem os códigos não é possível entrar — guarde-os num sítio seguro.
 
 **Encontrei um problema ou tenho uma sugestão.** Abra uma [issue](https://github.com/zanettidi/laguna-financial-releases/issues) neste repositório.
