@@ -13,7 +13,7 @@
 - **Acertar o saldo com o do banco** — escreva o saldo que o banco mostra e a diferença entra como um acerto, que não conta como gasto nem como ganho.
 - **Importar extratos do banco** — o ficheiro CSV que o site ou a app do banco exporta. As colunas são reconhecidas sozinhas e importar o mesmo extrato duas vezes não repete movimentos.
 - **Regras de categorização** — "descrição contém CONTINENTE → Supermercado": os movimentos importados já entram na categoria certa.
-- **Orçamentos** — semanais, mensais ou anuais, com aviso aos 80 % e aos 100 %.
+- **Orçamentos** — um total mensal e um total semanal para tudo o que gasta, sempre à vista, com cada semana do mês de segunda a domingo; e os que quiser por categoria ou etiqueta, semanais, mensais ou anuais. Aviso aos 80 % e aos 100 %.
 - **Pagamentos planeados e objetivos** — renda, ginásio, salário, com lembrete; quanto poupar por mês para chegar a um objetivo a tempo.
 - **Estatísticas** — fluxo de caixa, despesas e receitas por categoria e por etiqueta, evolução do saldo, comparação com o período anterior.
 - **Despesas para o IRS** — quanto gastou por ano em saúde, educação, habitação, IVA por exigência de fatura…, pela categoria de cada despesa, para conferir o e-fatura e classificar as faturas pendentes.
@@ -26,7 +26,7 @@
 | | |
 |---|---|
 | ![Movimentos do mês agrupados por dia](capturas/02-movimentos.png) | ![Estatísticas do mês: receitas, despesas, saldo e fluxo de caixa](capturas/03-estatisticas.png) |
-| ![Orçamentos com o progresso do mês](capturas/04-orcamentos.png) | ![Carteira de investimentos a preço de custo](capturas/05-investimentos.png) |
+| ![Orçamentos: total mensal, total semanal com as semanas do mês e orçamentos por categoria](capturas/04-orcamentos.png) | ![Carteira de investimentos a preço de custo](capturas/05-investimentos.png) |
 | ![Regras de categorização automática](capturas/06-regras.png) | ![Ecrã inicial no tema escuro](capturas/07-inicio-escuro.png) |
 | ![Recibos anexados a uma despesa](capturas/08-recibos.png) | ![Despesas para o IRS por tipo de dedução](capturas/09-irs.png) |
 
